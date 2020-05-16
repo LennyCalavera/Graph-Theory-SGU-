@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.3.0/raphael.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/js/dracula.js"></script>
+	<script src="/js/main.js"></script>
+	<link rel="stylesheet" type="text/css" href="/css/main.css">
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.css">
+	<meta charset=utf-8">
+	<title>Graph creator</title>
+
+</head>
+<body>
+	<h3 class="card-header">Graph creator</h3>
+	<div class="main-content">
+		<div class="menu">
+			<div class="section">
+				<div class="section-label-wrapper">
+					<a class="btn btn-success section-label" data-toggle="collapse" href="#createNewGraph_section" role="button" aria-expanded="false" aria-controls="createNewGraph_section">
+						Создать новый граф
+					</a>
+				</div>
+				<div class="collapse section-content" id="createNewGraph_section">
+					<div class="card-body">
+						<form class="form-group" name="createNewGraph_form" id="createNewGraph_form" method="post">
+							<div class="form-check">
+								<input class="form-check-input" type="checkbox" name="isDirected" value="true" id="createNewGraph_isDirected">
+								<label class="form-check-label" for="createNewGraph_isDirected">
+									Ориентированный?
+								</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" value="empty" onclick="collapseFile();" name="graphSource" id="createNewGraph_empty">
+								<label class="form-check-label" for="createNewGraph_empty">Пустой</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" value="fromFile" onclick="toggleFile();" name="graphSource" id="createNewGraph_fromFile">
+								<label class="form-check-label" for="createNewGraph_fromFile">Из файла .json</label>
+							</div>
+							<div class="file_input">
+								<input type="file" name="fileInput" class="form-control-file" id="file_input">
+							</div>
+						</form>
+						<button class="btn btn-danger" id="createNewGraph_btn" onclick="createNewGraph();">Создать</button>
+					</div>
+				</div>
+			</div>
+			<div class="section">
+				<div class="section-label-wrapper">
+					<a class="btn btn-primary section-label" data-toggle="collapse" href="#addVertex_section" role="button" aria-expanded="false" aria-controls="addVertex_section">
+						Добавить вершину
+					</a>
+				</div>
+				<div class="collapse section-content" id="addVertex_section">
+					<div class="card-body">
+						<form class="form-group" name="addVertex_form" id="addVertex_form" method="post">
+							<div class="input-group input-group-sm mb-3">
+								<div class="input-group-prepend">
+									<span class="input-group-text">Имя</span>
+								</div>
+								<input type="text" name="name" id="addVertex_name" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm">
+							</div>
+						</form>
+						<button class="btn btn-danger" id="addVertex_btn" onclick="addVertexProcess();">Добавить</button>
+					</div>
+				</div>
+			</div>
+			<div class="section">
+				<div class="section-label-wrapper">
+					<a class="btn btn-primary section-label" data-toggle="collapse" href="#delVertex_section" role="button" aria-expanded="false" aria-controls="delVertex_section">
+						Удалить вершину
+					</a>
+				</div>
+				<div class="collapse section-content" id="delVertex_section">
+					<div class="card-body">
+						<form class="form-group" name="delVertex_form" id="delVertex_form" method="post">
+							<div class="input-group input-group-sm mb-3">
+								<div class="input-group-prepend">
+									<span class="input-group-text">Имя</span>
+								</div>
+								<input type="text" id="delVertex_name" name="name" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm">
+							</div>
+						</form>
+						<button class="btn btn-danger" id="delVertex_btn" onclick="delVertexProcess();">Удалить</button>
+					</div>
+				</div>
+			</div>
+			<div class="section">
+				<div class="section-label-wrapper">
+					<a class="btn btn-primary section-label" data-toggle="collapse" href="#addEdge_section" role="button" aria-expanded="false" aria-controls="addEdge_section">
+						Добавить ребро
+					</a>
+				</div>
+				<div class="collapse section-content" id="addEdge_section">
+					<div class="card-body">
+						<form class="form-group" name="addEdge_form" id="addEdge_form" method="post">
+							<div class="input-group input-group-sm mb-3">
+								<div class="input-group-prepend">
+									<span class="input-group-text">Имя начальной</span>
+								</div>
+								<input type="text" name="nameStart"  id="addEdge_name1" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm">
+							</div>
+							<div class="input-group input-group-sm mb-3">
+								<div class="input-group-prepend">
+									<span class="input-group-text">Имя конечной</span>
+								</div>
+								<input type="text" name="nameEnd" id="addEdge_name2" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm">
+							</div>
+							<div class="input-group input-group-sm mb-3">
+								<div class="input-group-prepend">
+									<span class="input-group-text">Вес</span>
+								</div>
+								<input type="text" name="weight"  id="addEdge_weight" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm">
+							</div>
+						</form>
+						<button class="btn btn-danger" id="addEdge_btn" onclick="addEdgeProcess();">Добавить</button>
+					</div>
+				</div>
+			</div>
+			<div class="section">
+				<div class="section-label-wrapper">
+					<a class="btn btn-primary section-label" data-toggle="collapse" href="#delEdge_section" role="button" aria-expanded="false" aria-controls="delEdge_section">
+						Удалить ребро
+					</a>
+				</div>
+				<div class="collapse section-content" id="delEdge_section">
+					<div class="card-body">
+						<form class="form-group" name="delEdge_form" id="delEdge_form" method="post">
+							<div class="input-group input-group-sm mb-3">
+								<div class="input-group-prepend">
+									<span class="input-group-text">Имя начальной</span>
+								</div>
+								<input type="text" name="nameStart" id="delEdge_name1" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm">
+							</div>
+							<div class="input-group input-group-sm mb-3">
+								<div class="input-group-prepend">
+									<span class="input-group-text">Имя конечной</span>
+								</div>
+								<input type="text" name="nameEnd" id="delEdge_name2" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm">
+							</div>
+						</form>
+						<button class="btn btn-danger" id="delEdge_btn" onclick="delEdgeProcess();">Удалить</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="playground" id="playground">
+			<input type="text" id="orientation_mode" aria-label="Small" class="form-control direction_mode" value="" readonly>
+			<div id="canvas"></div>
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{
+  "isDirected": false,
+  "vertexes": [
+    "1",
+    "2",
+    "3"
+  ],
+  "edges": [
+    {
+      "start": "1",
+      "end": "2",
+      "weight": "2"
+    },
+    {
+      "start": "2",
+      "end": "3",
+      "weight": "2"
+    },
+    {
+      "start": "1",
+      "end": "3",
+      "weight": "1"
+    }
+  ],
+  "errors": []
+}

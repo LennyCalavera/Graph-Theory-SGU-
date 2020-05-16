@@ -1,0 +1,58 @@
+/*.section[aria-expanded="true"] {*/
+/*    background-color: green;*/
+/*}*/
+
+.section-label-wrapper {
+    padding: 5px;
+}
+
+.section {
+
+}
+
+.card-header {
+    height: 9vh;
+}
+
+.section-label {
+    width: 100%;
+    padding: 10px;
+}
+
+.section-label :last-of-type {
+    margin-bottom: 0;
+}
+
+.section-content {
+    text-align: center;
+}
+
+.main-content {
+    margin: 0 10% 0 10%;
+    max-height: 300px;
+}
+
+.menu {
+    overflow: auto;
+    float: left;
+    width: 30%;
+    border-radius: 3px;
+    border: 1px solid #d1d5da;
+    max-height: 90vh;
+}
+
+.playground {
+    border-radius: 3px;
+    float: right;
+    width: 70%;
+    background-color: #fefefe;
+    border: 1px solid #d1d5da;
+}
+
+.direction_mode {
+    text-align: center;
+}
+
+.file_input {
+    display: none;
+}
