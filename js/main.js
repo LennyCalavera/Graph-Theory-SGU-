@@ -3,7 +3,7 @@ window.onload = function() {
     index();
 };
 
-function request(action, reqData, func) {
+function request(action, reqData, func = null) {
     $.ajax({
         url: '/backend/RequestHandler.php',
         type: "POST",
@@ -20,7 +20,12 @@ function request(action, reqData, func) {
                 alert('Ошибка!\n' + errors);
                 return
             }
-            func(response);
+            if (func) {
+                func(response);
+            }
+            else {
+                buildGraph(response);
+            }
         },
         error: function(response) {
             alert('Ошибка!\nДанные не отправлены/невалидный ответ/нет ответа');
@@ -40,8 +45,8 @@ function buildGraph(data) {
     $.each(data.edges, function( index, edge ) {
         g.addEdge(edge.from, edge.to, {
             directed: data.isDirected, // ориентированное ребро
-            stroke: "#fff", // цвета ребра?
-            fill: "#5a5", // цвета ребра?
+            stroke: "#fff", // цвета ребра внутри
+            fill: "#5a5", // цвета ребра снаружи
             label: edge.weight // надпись над ребром
         });
     });
@@ -72,11 +77,8 @@ function createNewGraph() {
             return;
         }
     }
-    var func = function(adjList) {
-        buildGraph(adjList);
-    };
     var data = new FormData($('#createNewGraph_form')[0]);
-    request('create', data, func);
+    request('create', data);
 }
 
 function addVertexProcess() {
@@ -85,11 +87,8 @@ function addVertexProcess() {
         alert('Введите имя вершины');
         return;
     }
-    var func = function(adjList) {
-        buildGraph(adjList);
-    };
     var data = new FormData($('#addVertex_form')[0]);
-    request('addVertex', data, func);
+    request('addVertex', data);
 }
 
 function delVertexProcess() {
@@ -98,11 +97,8 @@ function delVertexProcess() {
         alert('Введите имя вершины');
         return;
     }
-    var func = function(adjList) {
-        buildGraph(adjList);
-    };
     var data = new FormData($('#delVertex_form')[0]);
-    request('delVertex', data, func);
+    request('delVertex', data);
 }
 
 function addEdgeProcess() {
@@ -115,11 +111,8 @@ function addEdgeProcess() {
         alert('Одинаковые имена вершин');
         return;
     }
-    var func = function(adjList) {
-        buildGraph(adjList);
-    };
     var data = new FormData($('#addEdge_form')[0]);
-    request('addEdge', data, func);
+    request('addEdge', data);
 }
 
 function delEdgeProcess() {
@@ -132,53 +125,83 @@ function delEdgeProcess() {
         alert('Одинаковые имена вершин');
         return;
     }
-    var func = function(adjList) {
-        buildGraph(adjList);
-    };
     var data = new FormData($('#delEdge_form')[0]);
-    request('delEdge', data, func);
+    request('delEdge', data);
 }
 
 function index() {
-    var func = function(adjList) {
-        buildGraph(adjList);
-    };
-    request('index', '', func);
+    request('index', '');
 }
 
 function toggleFile() {
-    $('.file_input').css('display', 'block');
+    $('.file_input_hidden').css('display', 'block');
 }
 
 function collapseFile() {
-    $('.file_input').css('display', 'none');
+    $('.file_input_hidden').css('display', 'none');
 }
 
-// function buildGraph(data) {
-// //     var g = new Graph();
-// //     // добавляем узел с id "bebebe" и подписью "stand alone"
-// //     // последний аргумент метода addNode - необязательный
-// //     g.addNode("bebebe", {label: "stand alone"});
-// //     for (var i = 1; i <= 13; i++) {
-// //         // метод addEdge(a, b) создает ребро между узлами а и b
-// //         // если узлы a и b еще не созданы, они создадутся автоматически
-// //         g.addEdge(i, (i + 3) % 5 + 1);
-// //         var j = (i + 7) % 5 + 1;
-// //
-// //         // можно указать дополнительные свойства ребра
-// //         g.addEdge(i, j, {
-// //             directed: true, // ориентированное ребро
-// //             stroke: "#fff", fill: "#5a5", // цвета ребра
-// //             label: i + ":" + j // надпись над ребром
-// //         });
-// //     }
-// //     // вычисляем расположение вершин перед выводом
-// //     var layouter = new Graph.Layout.Spring(g);
-// //     layouter.layout();
-// //     // выводим граф
-// //     var w = $('#playground').css('width');
-// //     w = w.replace('px', '');
-// //     var renderer = new Graph.Renderer.Raphael('canvas', g, Number(w));
-// //     renderer.draw();
-// // }
+function task1() {
+    event.preventDefault();
+    request('task1', '');
+}
 
+function task2() {
+    event.preventDefault();
+    if ($("#task2_file1")[0].files.length == 0 || $("#task2_file2")[0].files.length == 0) {
+        alert('Файлы не выбраны');
+        return;
+    }
+    var fileName1 = $("#task2_file1")[0].files[0].name;
+    var fileName2 = $("#task2_file2")[0].files[0].name;
+    if (fileName1.substr(fileName1.length - 5) != '.json' ||
+        fileName2.substr(fileName2.length - 5) != '.json'
+    ) {
+        alert('Разрешены только json файлы');
+        return;
+    }
+    var data = new FormData($('#task2_form')[0]);
+    request('task2', data);
+}
+
+function task3() {
+    event.preventDefault();
+    taskWithoutBuild('task3')
+}
+
+function task4() {
+    event.preventDefault();
+    taskWithoutBuild('task4')
+}
+
+function task5() {
+    event.preventDefault();
+    taskWithoutBuild('task5')
+}
+
+function task6() {
+    event.preventDefault();
+    taskWithoutBuild('task6')
+}
+
+function task7() {
+    event.preventDefault();
+    taskWithoutBuild('task7')
+}
+
+function task8() {
+    event.preventDefault();
+    taskWithoutBuild('task8')
+}
+
+function taskWithoutBuild(action) {
+    var func = function (response) {
+        if (response.answer) {
+            alert(response.answer);
+        }
+        else {
+            alert('Ответ не получен');
+        }
+    };
+    request(action, '', func);
+}
