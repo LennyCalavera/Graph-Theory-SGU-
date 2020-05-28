@@ -166,32 +166,32 @@ function task2() {
 
 function task3() {
     event.preventDefault();
-    taskWithoutBuild('task3')
+    taskWithoutBuild('task3');
 }
 
 function task4() {
     event.preventDefault();
-    taskWithoutBuild('task4')
+    request('task4', '');
 }
 
 function task5() {
     event.preventDefault();
-    taskWithoutBuild('task5')
+    taskWithoutBuild('task5');
 }
 
 function task6() {
     event.preventDefault();
-    taskWithoutBuild('task6')
+    taskWithoutBuild('task6');
 }
 
 function task7() {
     event.preventDefault();
-    taskWithoutBuild('task7')
+    taskWithoutBuild('task7');
 }
 
 function task8() {
     event.preventDefault();
-    taskWithoutBuild('task8')
+    taskWithoutBuild('task8');
 }
 
 function taskWithoutBuild(action) {

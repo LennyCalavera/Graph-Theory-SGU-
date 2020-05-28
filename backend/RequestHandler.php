@@ -111,6 +111,7 @@ function index($graphData) {
 }
 
 function create($graphData) {
+	$graphData = [];
 	$graphSource = $_POST['graphSource'];
 	if ($graphSource === 'fromFile') {
 		if (isset($_FILES['fileInput'])) {

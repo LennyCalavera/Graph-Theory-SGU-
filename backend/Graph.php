@@ -2,7 +2,7 @@
 
 class Graph {
 
-	private $isDirected;
+	private $isDirected = false;
 	private $adjList = [];
 
 	/**
@@ -14,7 +14,7 @@ class Graph {
 		if (isset($data['isDirected'])) {
 			$this->isDirected = $data['isDirected'];
 		}
-		else {
+		else if (!empty($data)) {
 			throw new Exception('Признак ориентированности графа не определен в файле');
 		}
 		$this->adjList = $data['list'] ?? [];
@@ -68,30 +68,41 @@ class Graph {
 		return $from . '/' . $to;
 	}
 
-	public function getEdgesFromAdjList() {
+	private function getEdgesFromAdjList() {
 		$result = [];
-		$edgeIndexes = [];
 		foreach ($this->adjList as $fromVertex => $edge) {
 			foreach ($edge as $toVertex => $weight) {
-				if (!$this->isDirected) {
-					$index = $this->getEdgeIndex($fromVertex, $toVertex);
-					if (in_array($index, $edgeIndexes)) {
-						continue;
-					}
-					$edgeIndexes[] = $index;
-					$edgeIndexes[] = $this->getEdgeIndex($toVertex, $fromVertex);
-				}
 				$result[] = ['from' => $fromVertex, 'to' => $toVertex, 'weight' => $weight];
 			}
 		}
 		return $result;
 	}
 
+	//если граф неориентированый то у между всеми связанными вершинами удаляется по ребру 1 направления
+	//требуется для визуальной части
+	public function prettifyEdges($edgesList) {
+		$pretty = $edgeIndexes = [];
+		foreach ($edgesList as $edge) {
+			$index = $this->getEdgeIndex($edge['from'], $edge['to']);
+			if (in_array($index, $edgeIndexes)) {
+				continue;
+			}
+			$edgeIndexes[] = $index;
+			$edgeIndexes[] = $this->getEdgeIndex($edge['to'], $edge['from']);
+			$pretty[] = $edge;
+		}
+		return $pretty;
+	}
+
 	public function getResponseData() {
+		$edges = $this->getEdgesFromAdjList();
+		if (!$this->isDirected) {
+			$edges = $this->prettifyEdges($edges);
+		}
 		return [
 			'isDirected' => $this->isDirected,
 			'vertexes' => array_keys($this->adjList),
-			'edges' => $this->getEdgesFromAdjList()
+			'edges' => $edges
 		];
 	}
 
@@ -197,7 +208,7 @@ class Graph {
 	}
 
 	// поиск в глубину, отмечаем $used, заполняем $component
-	public function fillComponentDS($from, $component, &$used) {
+	private function fillComponentDS($from, $component, &$used) {
 		$used[] = $from;
 		$component[] = $from;
 		foreach ($this->adjList[$from] as $to => $weight) {
@@ -208,28 +219,143 @@ class Graph {
 		return $component;
 	}
 
+	/**
+	 * @return Closure
+	 */
+	private function getSortFn() {
+		return function ($a, $b) {
+			if ($a['weight'] == $b['weight']) {
+				return 0;
+			}
+			return ($a['weight'] < $b['weight']) ? -1 : 1;
+		};
+	}
+
 //	(Прим, Краскал, Борувки) Дан взвешенный неориентированный граф из N вершин и M ребер.
 //	Требуется найти в нем каркас минимального веса.
+// 	Выбран алгоритм Крускала
 	public function task4() {
-		return ['answer' => 'ok'];
+		$result = [];
+		$cost = 0; //сумма весов
+		$edgeList = $this->getEdgesFromAdjList(); //формируем список ребер из списка смежности
+		usort($edgeList, $this->getSortFn()); //сортируем по весам ребра
+		$treeId = [];
+		$vertexes = array_keys($this->adjList);
+		for ($i=0; $i < count($vertexes); $i++) {
+			$treeId[$vertexes[$i]] = $i; //пишем каждой вершине свой ид
+		}
+		foreach ($edgeList as $edge) {
+			$from = $edge['from'];
+			$to = $edge['to'];
+			$weight = $edge['weight'];
+			if ($treeId[$from] !== $treeId[$to]) {
+				$cost += $weight;
+				$result[] = ['from' => $from, 'to' => $to, 'weight' => $weight];
+				$oldId = $treeId[$to];
+				$newId = $treeId[$from];
+				$treeId[$to] = $treeId[$from];
+				foreach ($treeId as $vertex => $id) {
+					if ($id === $oldId) {
+						$treeId[$vertex] = $newId;
+					}
+				}
+			}
+		}
+		if (!$this->isDirected) {
+			$result = $this->prettifyEdges($result);
+		}
+		return [
+			'isDirected' => $this->isDirected,
+			'vertexes' => array_keys($this->adjList),
+			'edges' => $result
+		];
 	}
 
 //	(В графе нет рёбер отрицательного веса) (Дейкстра) Найти вершину, сумма длин
 // 	кратчайших путей от которой до остальных вершин минимальна.
 	public function task5() {
-		return ['answer' => 'ok'];
+		$minCosts = [];
+		foreach ($this->adjList as $vertex => $edges) {
+			$minCosts[$vertex] = 0;
+			$dist = $this->dejkstra($vertex);
+			foreach ($dist as $vertexDist) {
+				$minCosts[$vertex] += $vertexDist;
+			}
+		}
+		$answer = 'Ответ: ' . array_keys($minCosts, min($minCosts))[0];
+		return ['answer' => $answer];
+	}
+
+	private function dejkstra($start) {
+		$inf = PHP_INT_MAX;
+		$dist = $used = [];
+		foreach ($this->adjList as $vertex => $edges) {
+			$dist[$vertex] = $inf;
+			$used[$vertex] = false;
+		}
+		$dist[$start] = $min_dist = $result =0;
+		while ($min_dist < $inf) {
+			$i = $start;
+			$used[$i] = true;
+			foreach ($this->adjList[$i] as $to => $weight) {
+				if ($dist[$i] + $weight < $dist[$to]) {
+					$dist[$to] = $dist[$i] + $weight;
+				}
+			}
+			$min_dist = $inf;
+			foreach ($this->adjList as $vertex => $edges) {
+				if (!$used[$vertex] && $dist[$vertex] < $min_dist) {
+					$min_dist = $dist[$vertex];
+					$start = $vertex;
+				}
+			}
+		}
+		return $dist;
 	}
 
 //	(В графе нет циклов отрицательного веса) (Форд-Беллман, Флойд) Найти вершину,
 // 	сумма длин кратчайших путей от которой до остальных вершин минимальна.
 	public function task6() {
-		return ['answer' => 'ok'];
+		$minCosts = [];
+		foreach ($this->adjList as $vertex => $edges) {
+			$minCosts[$vertex] = 0;
+			$dist = $this->fordBellman($vertex);
+			foreach ($dist as $vertexDist) {
+				$minCosts[$vertex] += $vertexDist;
+			}
+		}
+		$answer = 'Ответ: ' . array_keys($minCosts, min($minCosts))[0];
+		return ['answer' => $answer];
+	}
+
+	public function fordBellman($start) {
+		$inf = 1000000000;
+		$edgeList = $this->getEdgesFromAdjList();
+		$dist = [];
+		foreach ($this->adjList as $vertex => $edges) {
+			$dist[$vertex] = $inf;
+		}
+		$dist[$start] = 0;
+		for ($i = 1; $i < count($dist); ++$i) {
+			foreach ($edgeList as $edge) {
+				if ($dist[$edge['from']] + $edge['weight'] < $dist[$edge['to']]) {
+					$dist[$edge['to']] = $dist[$edge['from']] + $edge['weight'];
+				}
+			}
+		}
+		foreach ($edgeList as $edge) {
+			if ($dist[$edge['from']] + $edge['weight'] < $dist[$edge['to']]) {
+				throw new \Exception('Есть цикл отрицательного веса!');
+			}
+		}
+		return $dist;
 	}
 
 //	(В графе могут быть циклы отрицательного веса.)(Форд-Беллман, Флойд) Найти вершину,
 // 	сумма длин кратчайших путей от которой до остальных вершин минимальна.
+//  проверка на отрицательные циклы уже реализована в прошлом задании
 	public function task7() {
-		return ['answer' => 'ok'];
+		return $this->task6();
 	}
 
 //	Решить задачу на нахождение максимального потока любым алгоритмом.
