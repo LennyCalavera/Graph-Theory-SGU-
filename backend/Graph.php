@@ -99,15 +99,11 @@ class Graph {
 		if (!$this->isDirected) {
 			$edges = $this->prettifyEdges($edges);
 		}
-		return [
-			'isDirected' => $this->isDirected,
-			'vertexes' => array_keys($this->adjList),
-			'edges' => $edges
-		];
+		return ['isDirected' => $this->isDirected, 'vertexes' => array_keys($this->adjList), 'edges' => $edges];
 	}
 
 	public function addVertex($name) {
-		if (!isset($this->adjList[$name])){
+		if (!isset($this->adjList[$name])) {
 			$this->adjList[$name] = [];
 		}
 		else {
@@ -134,9 +130,9 @@ class Graph {
 	public function addEdge($from, $to, $weight = 0) {
 		$exist = isset($this->adjList[$from][$to]);
 		if (!$exist) {
-			$this->adjList[$from][$to] = (int) $weight;
+			$this->adjList[$from][$to] = (int)$weight;
 			if (!$this->isDirected) {
-				$this->adjList[$to][$from] = (int) $weight;
+				$this->adjList[$to][$from] = (int)$weight;
 			}
 		}
 		else {
@@ -194,7 +190,7 @@ class Graph {
 		foreach ($this->adjList as $from => $edges) {
 			if (!in_array($from, $used)) {
 				$component = [];
-				$components[] = $this->fillComponentDS($from, $component,$used);
+				$components[] = $this->fillComponentDS($from, $component, $used);
 			}
 		}
 		$answer = "Связные компоненты графа: \n";
@@ -235,13 +231,16 @@ class Graph {
 //	Требуется найти в нем каркас минимального веса.
 // 	Выбран алгоритм Крускала
 	public function task4() {
+		if ($this->isDirected) {
+			throw new Exception('Граф ориентирован');
+		}
 		$result = [];
 		$cost = 0; //сумма весов
 		$edgeList = $this->getEdgesFromAdjList(); //формируем список ребер из списка смежности
 		usort($edgeList, $this->getSortFn()); //сортируем по весам ребра
 		$treeId = [];
 		$vertexes = array_keys($this->adjList);
-		for ($i=0; $i < count($vertexes); $i++) {
+		for ($i = 0; $i < count($vertexes); $i++) {
 			$treeId[$vertexes[$i]] = $i; //пишем каждой вершине свой ид
 		}
 		foreach ($edgeList as $edge) {
@@ -264,11 +263,7 @@ class Graph {
 		if (!$this->isDirected) {
 			$result = $this->prettifyEdges($result);
 		}
-		return [
-			'isDirected' => $this->isDirected,
-			'vertexes' => array_keys($this->adjList),
-			'edges' => $result
-		];
+		return ['isDirected' => $this->isDirected, 'vertexes' => array_keys($this->adjList), 'edges' => $result];
 	}
 
 //	(В графе нет рёбер отрицательного веса) (Дейкстра) Найти вершину, сумма длин
@@ -293,7 +288,7 @@ class Graph {
 			$dist[$vertex] = $inf;
 			$used[$vertex] = false;
 		}
-		$dist[$start] = $min_dist = $result =0;
+		$dist[$start] = $min_dist = $result = 0;
 		while ($min_dist < $inf) {
 			$i = $start;
 			$used[$i] = true;
@@ -359,6 +354,7 @@ class Graph {
 	}
 
 //	Решить задачу на нахождение максимального потока любым алгоритмом.
+// выбран алгоритм Форда-Фалкерсона
 	public function task8() {
 		return ['answer' => 'ok'];
 	}

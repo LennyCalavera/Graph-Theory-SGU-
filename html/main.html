@@ -266,9 +266,20 @@
 				</div>
 				<div class="collapse section-content" id="task8">
 					<div class="card-body">
-						<a class="input-group input-group-sm mb-3">
-							Решить задачу на нахождение максимального потока любым алгоритмом
-						</a>
+						<form class="form-group" name="delEdge_form" id="task8_form" method="post">
+							<div class="input-group input-group-sm mb-3">
+								<div class="input-group-prepend">
+									<span class="input-group-text">Имя вершины истока</span>
+								</div>
+								<input type="text" name="nameStart" id="task8_name1" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm">
+							</div>
+							<div class="input-group input-group-sm mb-3">
+								<div class="input-group-prepend">
+									<span class="input-group-text">Имя вершины стока</span>
+								</div>
+								<input type="text" name="nameEnd" id="task8_name2" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm">
+							</div>
+						</form>
 						<button class="btn btn-danger" id="task8_btn" onclick="task8();">Вычислить</button>
 					</div>
 				</div>

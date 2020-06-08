@@ -1,9 +1,9 @@
 <?php
 
-require_once ($_SERVER['DOCUMENT_ROOT'] . '\backend\Graph.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '\backend\Graph.php');
 
 const EXT_JSON = '.json';
-const DATA_PATH  = '/storage/';
+const DATA_PATH = '/storage/';
 
 $headers = getallheaders();
 $action = $headers['graphAction'] ?? null;
@@ -22,7 +22,7 @@ catch (Exception $ex) {
  */
 function processUserAction($action, $uid) {
 	if (!$uid) {
-		throw new Exception('Используйте '. $_SERVER['HTTP_HOST'] . ', не удаляйте куки!');
+		throw new Exception('Используйте ' . $_SERVER['HTTP_HOST'] . ', не удаляйте куки!');
 	}
 	$graphData = getUserData($uid);
 	if (function_exists($action)) {
